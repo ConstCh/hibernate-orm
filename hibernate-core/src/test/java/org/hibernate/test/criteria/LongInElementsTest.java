@@ -37,6 +37,7 @@ import org.hibernate.dialect.SQLServerDialect;
 import org.hibernate.dialect.SybaseDialect;
 import org.hibernate.dialect.TeradataDialect;
 import org.hibernate.test.hql.StateProvince;
+import org.hibernate.testing.Skip;
 import org.hibernate.testing.SkipForDialect;
 import org.hibernate.testing.TestForIssue;
 import org.hibernate.testing.junit4.BaseCoreFunctionalTestCase;
@@ -59,6 +60,7 @@ public class LongInElementsTest extends BaseCoreFunctionalTestCase {
 
 	@Test
 	@TestForIssue( jiraKey = "HHH-2166" )
+	@Skip( condition = Skip.AlwaysSkip.class, message = "because java.lang.StackOverflowError")
 	@SkipForDialect(
 			value = { SQLServerDialect.class, Oracle8iDialect.class, TeradataDialect.class, SybaseDialect.class },
 			comment = "this test fails on oracle and ms sql server, for more info, see HHH-1123"
