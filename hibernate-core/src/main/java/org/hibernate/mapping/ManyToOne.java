@@ -77,7 +77,7 @@ public class ManyToOne extends ToOne {
 					);
 			} 
 			else {
-				if ( !hasFormula() && !"none".equals( getForeignKeyName() ) ) {
+				if ( !hasFormula() && !pc.isInherited() && !"none".equals( getForeignKeyName() ) ) {
 					java.util.List refColumns = new ArrayList();
 					Iterator iter = property.getColumnIterator();
 					while ( iter.hasNext() ) {
