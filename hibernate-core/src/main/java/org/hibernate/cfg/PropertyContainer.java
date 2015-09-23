@@ -26,18 +26,6 @@
 
 package org.hibernate.cfg;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
-import javax.persistence.Access;
-import javax.persistence.ManyToMany;
-import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
-import javax.persistence.OneToOne;
-import javax.persistence.Transient;
-
 import org.hibernate.AnnotationException;
 import org.hibernate.MappingException;
 import org.hibernate.annotations.ManyToAny;
@@ -47,8 +35,10 @@ import org.hibernate.annotations.common.reflection.XClass;
 import org.hibernate.annotations.common.reflection.XProperty;
 import org.hibernate.internal.CoreMessageLogger;
 import org.hibernate.internal.util.StringHelper;
-
 import org.jboss.logging.Logger;
+
+import javax.persistence.*;
+import java.util.*;
 
 /**
  * A helper class to keep the {@code XProperty}s of a class ordered by access type.
@@ -70,14 +60,14 @@ class PropertyContainer {
 	 * this does not mean that all {@code XProperty}s in this map are fields. Due to JPA access rules single properties
 	 * can have different access type than the overall class access type.
 	 */
-	private final TreeMap<String, XProperty> fieldAccessMap;
+	private final Map<String, XProperty> fieldAccessMap;
 
 	/**
 	 * Constains the properties which must be returned in case the class is accessed via {@code AccessType.Property}. Note,
 	 * this does not mean that all {@code XProperty}s in this map are properties/methods. Due to JPA access rules single properties
 	 * can have different access type than the overall class access type.
 	 */
-	private final TreeMap<String, XProperty> propertyAccessMap;
+	private final Map<String, XProperty> propertyAccessMap;
 
 	/**
 	 * The class for which this container is created.
@@ -189,13 +179,13 @@ class PropertyContainer {
 	 *
 	 * @return A maps of the properties with the given access type keyed against their property name
 	 */
-	private TreeMap<String, XProperty> initProperties(AccessType access) {
+	private Map<String, XProperty> initProperties(AccessType access) {
 		if ( !( AccessType.PROPERTY.equals( access ) || AccessType.FIELD.equals( access ) ) ) {
 			throw new IllegalArgumentException( "Access type has to be AccessType.FIELD or AccessType.Property" );
 		}
 
 		//order so that property are used in the same order when binding native query
-		TreeMap<String, XProperty> propertiesMap = new TreeMap<String, XProperty>();
+		Map<String, XProperty> propertiesMap = new LinkedHashMap<String, XProperty>();
 		List<XProperty> properties = xClass.getDeclaredProperties( access.getType() );
 		for ( XProperty property : properties ) {
 			if ( mustBeSkipped( property ) ) {
