@@ -6,6 +6,8 @@
  */
 package org.hibernate.cfg;
 
+import org.jboss.logging.Logger;
+
 import org.hibernate.AnnotationException;
 import org.hibernate.AssertionFailure;
 import org.hibernate.MappingException;
@@ -31,6 +33,7 @@ import org.hibernate.mapping.Collection;
 import org.hibernate.mapping.Column;
 import org.hibernate.mapping.Component;
 import org.hibernate.mapping.Join;
+import org.hibernate.mapping.KeyValue;
 import org.hibernate.mapping.MappedSuperclass;
 import org.hibernate.mapping.PersistentClass;
 import org.hibernate.mapping.Property;
@@ -393,7 +396,19 @@ public class BinderHelper {
 			matchColumnsByProperty( (Property) it.next(), columnsToProperty );
 		}
 		if ( isPersistentClass ) {
-			matchColumnsByProperty( ( (PersistentClass) columnOwner ).getIdentifierProperty(), columnsToProperty );
+			if ( ((PersistentClass) columnOwner).getIdentifierProperty() != null ) {
+				matchColumnsByProperty( ((PersistentClass) columnOwner).getIdentifierProperty(), columnsToProperty );
+			}
+			else
+			{
+				KeyValue id = ( (PersistentClass) columnOwner ).getIdentifier();
+				if ( id instanceof Component ) {
+					Iterator keyIt = ((Component) id).getPropertyIterator();
+					while ( keyIt.hasNext() ) {
+						matchColumnsByProperty( (Property) keyIt.next(), columnsToProperty );
+					}
+				}
+			}
 		}
 
 		//first naive implementation
